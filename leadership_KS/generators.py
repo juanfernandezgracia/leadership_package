@@ -3,6 +3,7 @@ def generate_random_times(a=2.0,tmax=1000):
     """
     Generate two random sequences
     """
+    from random import expovariate
     times={1:[],2:[]}
     ids=times.keys()
     lam=1.0
@@ -24,20 +25,17 @@ def generate_correlated_times(delta=2.0,dt=0.5,tmax=1000):
     while t<tmax:
         times[1].append(t)
         t+=expovariate(lam)
-    #to integrate the second process I use a Poisson process of rate one and do a change of timescales
+    #to integrate the second process I use a Poisson process of rate one
+    #and do a change of timescales
     #first I have to compute lambda(t) in order to do it only once
     t=0.0
     tau=expovariate(lam)
-    #print('Hi!',tau,t,times[1][0])
     lam_l=lam_det(times[1],dt)
     t=inverted_time_step(tau,t,lam_l,delta,dt)
-    #print('Hi2!',tau,t)
     while t<tmax:
-    #for i in range(10):
         times[2].append(t)
         tau=expovariate(lam)
         t+=inverted_time_step(tau,t,lam_l,delta,dt)
-        #print(t)
     return times
 
 def lam_det(times,dt):
@@ -70,7 +68,6 @@ def inverted_time_step(tau_targ,t,lam,delta,dt):
     tau=0.0
     for i in range(N_lam_g-1):
         dtau=(lam_g[i+1][0]-lam_g[i][0])*(1.0+delta*lam_g[i][1])
-        #print('dd',dtau,N_lam)
         tau+=dtau
         if tau > tau_targ:
             t_good=lam_g[i][0]+(tau_targ-tau+dtau)/(1.0+delta*lam_g[i][1])

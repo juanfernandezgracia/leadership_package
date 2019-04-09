@@ -1,4 +1,5 @@
 import numpy as np
+import datetime
 
 def ks_2samp(data1, data2):
     """
@@ -51,6 +52,8 @@ def ks_2samp(data1, data2):
     >>> stats.ks_2samp(rvs1, rvs4)
     (0.07999999999999996, 0.41126949729859719)
     """
+    from scipy import asarray
+    from scipy.stats import kstwobign
     data1, data2 = map(asarray, (data1, data2))
     n1 = data1.shape[0]
     n2 = data2.shape[0]
@@ -94,6 +97,7 @@ def randomize_times(times, ids = []):
         For each element a list of reshuffled event times
     
     """
+    from random import shuffle
     times_random = dict()
     if len(ids) == 0:
         ids = times.keys()
@@ -129,110 +133,142 @@ def waiting_times(times, ids, tfloat=True):
     tab, tba : lists of time differences
         
     """
-    flag=0
-    tab=list()
-    tba=list()
-    idi=ids[0]
-    idj=ids[1]
-    imin=min(times[idi])
-    jmin=min(times[idj])
-    if jmin>imin:
-        a=idj
-        b=idi
-        flag=1
+    flag = 0
+    tab = list()
+    tba = list()
+    idi = ids[0]
+    idj = ids[1]
+    imin = min(times[idi])
+    jmin = min(times[idj])
+    if jmin > imin:
+        a = idj
+        b = idi
+        flag = 1
     else:
-        a=idi
-        b=idj
-        flag=0
-    Na=len(times[a])
-    Nb=len(times[b])
-    bx=0
-    ax=0
+        a = idi
+        b = idj
+        flag = 0
+    Na = len(times[a])
+    Nb = len(times[b])
+    bx = 0
+    ax = 0
     if tfloat:
         while ax < Na-1 and bx < Nb-1:
-            while times[b][bx]<=times[a][ax] and bx<Nb-1:
-                bx+=1
-            if bx!=Nb-1:
-                aux=times[a][ax]-times[b][bx-1]
-                dtab=aux
+            while times[b][bx] <= times[a][ax] and bx < Nb-1:
+                bx += 1
+            if bx != Nb-1:
+                aux = times[a][ax] - times[b][bx-1]
+                dtab = aux
                 tab.append(dtab)
-            while times[a][ax]<=times[b][bx] and ax<Na-1:
-                ax+=1
-            if ax!=Na-1:
-                aux=times[b][bx]-times[a][ax-1]
-                dtba=aux
+            while times[a][ax] <= times[b][bx] and ax < Na-1:
+                ax+ = 1
+            if ax! = Na-1:
+                aux = times[b][bx] - times[a][ax-1]
+                dtba = aux
                 tba.append(dtba)
     else:
         while ax < Na-1 and bx < Nb-1:
-            while times[b][bx]<=times[a][ax] and bx<Nb-1:
-                bx+=1
-            if bx!=Nb-1:
-                aux=times[a][ax]-times[b][bx-1]
-                dtab=aux.days*24.0*60.0+aux.seconds/60.0
+            while times[b][bx] <= times[a][ax] and bx < Nb-1:
+                bx += 1
+            if bx != Nb-1:
+                aux = times[a][ax] - times[b][bx-1]
+                dtab = aux.days*24.0*60.0 + aux.seconds/60.0
                 tab.append(dtab)
-            while times[a][ax]<=times[b][bx] and ax<Na-1:
-                ax+=1
-            if ax!=Na-1:
-                aux=times[b][bx]-times[a][ax-1]
-                dtba=aux.days*24.0*60.0+aux.seconds/60.0
+            while times[a][ax] <= times[b][bx] and ax < Na-1:
+                ax += 1
+            if ax != Na-1:
+                aux = times[b][bx] - times[a][ax-1]
+                dtba = aux.days*24.0*60.0 + aux.seconds/60.0
                 tba.append(dtba)
-    tba = list(filter(lambda x: x!= 0.0, tba))
-    tab = list(filter(lambda x: x!= 0.0, tab))
-    if flag==0:
-        return tab,tba
+    tba = list(filter(lambda x: x != 0.0, tba))
+    tab = list(filter(lambda x: x != 0.0, tab))
+    if flag == 0:
+        return tab, tba
     else:
-        return tba,tab
+        return tba, tab
 
-def D_KS_tau_pvalue_global(times,Nruns=100,tfloat=True):
+def D_KS_tau_pvalue_global(times, pmax = 1.0, Nruns=100, min_int=50, tfloat=True):
     """
-    
+    Gives back the network of follower-followees with a maximum p-value pmax,
+    following a global reshuffling scheme.
+    Parameters
+    ----------
+    times : dictionary of lists
+        The dictionary contains for each element their times of events in a list
+    pmax : float (optional)
+        maximum p-value allowed for each edge
+    Nruns : integer (optional)
+        Number of reshufflings used for getting the p-value
+    min_int : integer
+        minimum number of interactions (waiting times)
+    tfloat : boolean variable 
+        If True the times are taken as floats, if False event times are datetime type
+    Returns
+    -------
+    g : Networkx DiGraph
+        Graph containing the information about the follower-followee network.
+        The edges have properties such as D_KS, p and tau.
     """
+    import networkx as nx
     g=nx.DiGraph()
-    tlist=[]
+    tlist = []
     for key in times.keys():
-        for j in range(len(times[key])):
-            tlist.append(times[key][j])
-    ids=list(times.keys())
-    N=len(ids)
+        tlist.extend(times[key])
+    ids = list(times.keys())
+    N = len(ids)
     for i in range(N-1):
         for j in range(i+1,N):
-            tab,tba=waiting_times({1:times[ids[i]],2:times[ids[j]]},tfloat=tfloat)
-            if len(tab) > 50 and len(tba) > 50:
-                D_KS,p_bad,tau=ks_2samp(tab,tba)
+            tab, tba = waiting_times(times, [ids[i], ids[j]], tfloat=tfloat)
+            if len(tab) > min_int and len(tba) > min_int:
+                D_KS, p_bad, tau = ks_2samp(tab, tba)
             else:
-                D_KS,p_bad,tau=(0.0,0.0,0.0)
+                D_KS, p_bad, tau=(0.0, 0.0, 0.0)
             if D_KS < 0.0:
-                g.add_edge(ids[j],ids[i],D_KS=-D_KS,tau=tau,p=Nruns)
+                g.add_edge(ids[j], ids[i], D_KS = -D_KS, tau=tau, p=Nruns)
             else:
-                g.add_edge(ids[i],ids[j],D_KS=D_KS,tau=tau,p=Nruns)
+                g.add_edge(ids[i], ids[j], D_KS = D_KS, tau=tau, p=Nruns)
     for irun in range(Nruns):
         print(Nruns-irun)
-        tlist=[]
-        for key in times.keys():
-            for j in range(len(times[key])):
-                tlist.append(times[key][j])
-        #print(len(tlist))
-        t_rand=randomize_times(tlist,times,ids)
+        t_rand = randomize_times(times)
         for edge in g.edges():
-            i=edge[0]
-            j=edge[1]
-            D_KS=g[i][j]['D_KS']
-            tab,tba=waiting_times({1:t_rand[i],2:t_rand[j]},tfloat=tfloat)
-            if len(tab) > 50 and len(tba) > 50:
-                D_KS_rand,p_bad,tau=ks_2samp(tab,tba)
+            i = edge[0]
+            j = edge[1]
+            D_KS = g[i][j]['D_KS']
+            tab, tba = waiting_times(times, [i, j], tfloat=tfloat)
+            if len(tab) > min_int and len(tba) > min_int:
+                D_KS_rand, p_bad, tau = ks_2samp(tab, tba)
             else:
-                D_KS_rand,p_bad,tau=(0.0,0.0,0.0)
+                D_KS_rand, p_bad, tau=(0.0,0.0,0.0)
             if abs(D_KS_rand) < abs(D_KS):
-                g[i][j]['p']-=1
+                g[i][j]['p'] -= 1
     for edge in g.edges():
-        i=edge[0]
-        j=edge[1]
-        g[i][j]['p']=float(g[i][j]['p'])/float(Nruns)
-    return g
+        i = edge[0]
+        j = edge[1]
+        g[i][j]['p'] = float(g[i][j]['p'])/float(Nruns)
+    G=networkx.DiGraph( [ (u,v,d) for u,v,d in g.edges(data=True) if d['p'] < pmax] )
+    return G
 
-def D_KS_tau_pvalue_local(t1,t2,Nruns=100,tfloat=True):
+def D_KS_tau_pvalue_local(times, pmax = 1.0, Nruns=100, min_int=50, tfloat=True):
     """
-    
+    Gives back the network of follower-followees with a maximum p-value pmax,
+    following a local reshuffling scheme.
+    Parameters
+    ----------
+    times : dictionary of lists
+        The dictionary contains for each element their times of events in a list
+    pmax : float (optional)
+        maximum p-value allowed for each edge
+    Nruns : integer (optional)
+        Number of reshufflings used for getting the p-value
+    min_int : integer
+        minimum number of interactions (waiting times)
+    tfloat : boolean variable 
+        If True the times are taken as floats, if False event times are datetime type
+    Returns
+    -------
+    g : Networkx DiGraph
+        Graph containing the information about the follower-followee network.
+        The edges have properties such as D_KS, p and tau.
     """
     times={1:t1,2:t2}
     tlist=t1+t2
@@ -253,6 +289,9 @@ def D_KS_tau_pvalue_local(t1,t2,Nruns=100,tfloat=True):
             p-=1
     p=float(p)/float(Nruns)
     return D_KS,tau,p
+
+
+
 
 def excess(t1,t2,dt=5,tmax=500,tfloat=True):
     """
