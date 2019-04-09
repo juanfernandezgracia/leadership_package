@@ -1,16 +1,15 @@
-import numpy as np
 import datetime
-import sys
 from scipy import asarray
 from scipy.stats import kstwobign
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-import random
+from random import shuffle
+
+
+
+
 import networkx as nx
 import powerlaw
 from random import expovariate
 from random import seed
-
 
 import os
 import pickle
@@ -24,5 +23,9 @@ from pyhawkes.models import \
     DiscreteTimeNetworkHawkesModelGammaMixture, \
     DiscreteTimeStandardHawkesModel, \
     DiscreteTimeNetworkHawkesModelSpikeAndSlab
+
+
+import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 name = 'leadership_KS'

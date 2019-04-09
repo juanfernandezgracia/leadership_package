@@ -1,4 +1,4 @@
-
+import numpy as np
 
 def ks_2samp(data1, data2):
     """
@@ -58,19 +58,19 @@ def ks_2samp(data1, data2):
     n2 = len(data2)
     data1 = np.sort(data1)
     data2 = np.sort(data2)
-    data_all = np.concatenate([data1,data2])
-    cdf1 = np.searchsorted(data1,data_all,side='right')/(1.0*n1)
-    cdf2 = np.searchsorted(data2,data_all,side='right')/(1.0*n2)
+    data_all = np.concatenate([data1, data2])
+    cdf1 = np.searchsorted(data1, data_all, side = 'right') / (1.0*n1)
+    cdf2 = np.searchsorted(data2, data_all, side = 'right') / (1.0*n2)
     tau=0
-    darray=cdf1-cdf2
+    darray = cdf1 - cdf2
     d = np.max(np.absolute(darray))
-    if d==-np.min(darray):
-        d=-d
-        jamfri=np.min(np.where(darray == np.min(darray))[0])
-    else:
-        jamfri=np.min(np.where(darray == darray.max())[0])
-    tau=data_all[jamfri]
     # Note: d signed distance
+    if d ==  -np.min(darray):
+        d = -d
+        jamfri = np.min(np.where(darray == np.min(darray))[0])
+    else:
+        jamfri = np.min(np.where(darray == np.max(darray))[0])
+    tau = data_all[jamfri]
     en = np.sqrt(n1*n2/float(n1+n2))
     try:
         prob = kstwobign.sf((en + 0.12 + 0.11 / en) * d)
@@ -78,25 +78,62 @@ def ks_2samp(data1, data2):
         prob = 1.0
     return d, prob, tau
 
-#randomize the data:
-def randomize_times(tlist,times,ids):
-    times_random=dict()
+def randomize_times(times, ids = []):
+    """
+    Randomize the times of the point events of all the ids that are given.
+    Parameters
+    ----------
+    times : dictionary of lists
+        The dictionary contains for each element their times of events in a list
+    ids : list of ids
+        If not given, the reshuffling is global, if some ids are given, 
+        only those will be used for the reshuffling.
+    Returns
+    -------
+    times_random : dictionary of lists
+        For each element a list of reshuffled event times
+    
+    """
+    times_random = dict()
+    if len(ids) == 0:
+        ids = times.keys()
+    Nevents = dict()
+    aux = 0
+    tlist = []
     for idn in ids:
-        times_random[idn]=list()
-        for i in range(len(times[idn])):
-            t=random.choice(tlist)
-            times_random[idn].append(t)
-            tlist.remove(t)
+        aux += len(times[idn])
+        Nevents[idn] = aux
+        tlist.extend(times[idn])
+    shuffle(tlist)
+    aux=0
+    for idn in ids:
+        times_random[idn] = tlist[aux:Nevents[idn]]
+        aux += Nevents[idn]
         times_random[idn].sort()
     return times_random
 
-def waiting_times(times,tfloat=True):
-    ids=times.keys()
+def waiting_times(times, ids, tfloat=True):
+    """
+    Get the waiting times for two individuals
+    Parameters
+    ----------
+    times : dictionary of lists
+        The dictionary contains for each element their times of events in a list
+    ids : 2 ids for the reshuffling in a list
+        If not given, the reshuffling is global, if some ids are given, 
+        only those will be used for the reshuffling.
+    tfloat : boolean variable
+        If True the times are taken as floats, if False event times are datetime type
+    Returns
+    -------
+    tab, tba : lists of time differences
+        
+    """
     flag=0
     tab=list()
     tba=list()
-    idi=1
-    idj=2
+    idi=ids[0]
+    idj=ids[1]
     imin=min(times[idi])
     jmin=min(times[idj])
     if jmin>imin:
@@ -113,37 +150,31 @@ def waiting_times(times,tfloat=True):
     ax=0
     if tfloat:
         while ax < Na-1 and bx < Nb-1:
-            #print ('hi',ax,bx,Na,Nb)
             while times[b][bx]<=times[a][ax] and bx<Nb-1:
                 bx+=1
             if bx!=Nb-1:
                 aux=times[a][ax]-times[b][bx-1]
                 dtab=aux
-                #if dtab > 0.0:
                 tab.append(dtab)
             while times[a][ax]<=times[b][bx] and ax<Na-1:
                 ax+=1
             if ax!=Na-1:
                 aux=times[b][bx]-times[a][ax-1]
                 dtba=aux
-                #if dtba > 0.0:
                 tba.append(dtba)
     else:
         while ax < Na-1 and bx < Nb-1:
-            #print ('hi',ax,bx,Na,Nb)
             while times[b][bx]<=times[a][ax] and bx<Nb-1:
                 bx+=1
             if bx!=Nb-1:
                 aux=times[a][ax]-times[b][bx-1]
                 dtab=aux.days*24.0*60.0+aux.seconds/60.0
-                #if dtab > 0.0:
                 tab.append(dtab)
             while times[a][ax]<=times[b][bx] and ax<Na-1:
                 ax+=1
             if ax!=Na-1:
                 aux=times[b][bx]-times[a][ax-1]
                 dtba=aux.days*24.0*60.0+aux.seconds/60.0
-                #if dtba > 0.0:
                 tba.append(dtba)
     tba = list(filter(lambda x: x!= 0.0, tba))
     tab = list(filter(lambda x: x!= 0.0, tab))
@@ -151,29 +182,11 @@ def waiting_times(times,tfloat=True):
         return tab,tba
     else:
         return tba,tab
-    
-def D_KS_tau_pvalue_local(t1,t2,Nruns=100,tfloat=True):
-    times={1:t1,2:t2}
-    tlist=t1+t2
-    ids=times.keys()
-    tab,tba=waiting_times(times,tfloat=tfloat)
-    if len(tab) < 50 or len(tba) < 50:
-        return 1.0,0.0,1.0
-    D_KS,p_bad,tau=ks_2samp(tab,tba)
-    p=Nruns
-    for irun in range(Nruns):
-        print(Nruns-irun)
-        tlist=t1+t2
-        t_rand=randomize_times(tlist,times,ids)
-        tab,tba=waiting_times(t_rand,tfloat=tfloat)
-        D_KS_rand,p_bad,tau_rand=ks_2samp(tab,tba)
-        print(Nruns-i,D_KS_rand,D_KS)
-        if abs(D_KS_rand) < abs(D_KS):
-            p-=1
-    p=float(p)/float(Nruns)
-    return D_KS,tau,p
 
 def D_KS_tau_pvalue_global(times,Nruns=100,tfloat=True):
+    """
+    
+    """
     g=nx.DiGraph()
     tlist=[]
     for key in times.keys():
@@ -217,9 +230,34 @@ def D_KS_tau_pvalue_global(times,Nruns=100,tfloat=True):
         g[i][j]['p']=float(g[i][j]['p'])/float(Nruns)
     return g
 
+def D_KS_tau_pvalue_local(t1,t2,Nruns=100,tfloat=True):
+    """
+    
+    """
+    times={1:t1,2:t2}
+    tlist=t1+t2
+    ids=times.keys()
+    tab,tba=waiting_times(times,tfloat=tfloat)
+    if len(tab) < 50 or len(tba) < 50:
+        return 1.0,0.0,1.0
+    D_KS,p_bad,tau=ks_2samp(tab,tba)
+    p=Nruns
+    for irun in range(Nruns):
+        print(Nruns-irun)
+        tlist=t1+t2
+        t_rand=randomize_times(tlist,times,ids)
+        tab,tba=waiting_times(t_rand,tfloat=tfloat)
+        D_KS_rand,p_bad,tau_rand=ks_2samp(tab,tba)
+        print(Nruns-i,D_KS_rand,D_KS)
+        if abs(D_KS_rand) < abs(D_KS):
+            p-=1
+    p=float(p)/float(Nruns)
+    return D_KS,tau,p
 
-#function to compute the excess probability
 def excess(t1,t2,dt=5,tmax=500,tfloat=True):
+    """
+    function to compute the excess probability
+    """
     x=np.asarray([dt*(i+0.5) for i in range(int(tmax/dt))])
     y=np.zeros(int(tmax/dt))
     y_norm=np.zeros(int(tmax/dt))
@@ -285,8 +323,7 @@ def excess(t1,t2,dt=5,tmax=500,tfloat=True):
         else:
             for j in range(len(y)):
                 y_norm[j]+=1.0
-    #print(y,y_norm,y/(dt*y_norm))
     y_f=[y[i]/(dt*y_norm[i]) for i in range(len(y))]
     return x,y_f
 
-
+# functions to plot basic quantities (missing)

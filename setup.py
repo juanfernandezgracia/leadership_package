@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="leadership_KS_juanfernandezgracia",
+    name="leadership_package_juanfernandezgracia",
     version="0.0.1",
     author="Juan Fernandez-Gracia",
     author_email="juanfernandez1984@gmail.com",
