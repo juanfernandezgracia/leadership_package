@@ -234,11 +234,11 @@ def D_KS_tau_pvalue_global(times, pmax = 1.0, Nruns=100, min_int=50, tfloat=True
             i = edge[0]
             j = edge[1]
             D_KS = g[i][j]['D_KS']
-            tab, tba = waiting_times(times, [i, j], tfloat=tfloat)
+            tab, tba = waiting_times(times, [i, j], tfloat = tfloat)
             if len(tab) > min_int and len(tba) > min_int:
                 D_KS_rand, p_bad, tau = ks_2samp(tab, tba)
             else:
-                D_KS_rand, p_bad, tau=(0.0,0.0,0.0)
+                D_KS_rand, p_bad, tau=(0.0, 0.0, 0.0)
             if abs(D_KS_rand) < abs(D_KS):
                 g[i][j]['p'] -= 1
     for edge in g.edges():
@@ -270,25 +270,33 @@ def D_KS_tau_pvalue_local(times, pmax = 1.0, Nruns=100, min_int=50, tfloat=True)
         Graph containing the information about the follower-followee network.
         The edges have properties such as D_KS, p and tau.
     """
-    times={1:t1,2:t2}
-    tlist=t1+t2
-    ids=times.keys()
-    tab,tba=waiting_times(times,tfloat=tfloat)
-    if len(tab) < 50 or len(tba) < 50:
-        return 1.0,0.0,1.0
-    D_KS,p_bad,tau=ks_2samp(tab,tba)
-    p=Nruns
-    for irun in range(Nruns):
-        print(Nruns-irun)
-        tlist=t1+t2
-        t_rand=randomize_times(tlist,times,ids)
-        tab,tba=waiting_times(t_rand,tfloat=tfloat)
-        D_KS_rand,p_bad,tau_rand=ks_2samp(tab,tba)
-        print(Nruns-i,D_KS_rand,D_KS)
-        if abs(D_KS_rand) < abs(D_KS):
-            p-=1
-    p=float(p)/float(Nruns)
-    return D_KS,tau,p
+    g = nx.DiGraph()
+    ids = times.keys()
+    for i in range(N-1):
+        idi = ids[i]
+        for j in range(i+1,N):
+            idj = ids[j]
+            tab, tba = waiting_times(times, [idi, idj], tfloat = tfloat)
+            if len(tab) < min_int or len(tba) < min_int:
+                D_KS, p_bad, tau = 0.0, 0.0, 0.0
+            else:
+                D_KS, p_bad, tau = ks_2samp(tab, tba)
+            p = Nruns
+            for irun in range(Nruns):
+                print(Nruns-irun)
+                t_rand = randomize_times( times, [idi, idj])
+                tab,tba = waiting_times(t_rand, tfloat = tfloat)
+                D_KS_rand, p_bad, tau_rand = ks_2samp(tab, tba)
+                if abs(D_KS_rand) < abs(D_KS):
+                    p-=1
+            p=float(p)/float(Nruns)
+            if p < pmax:
+                if D_KS < 0.0:
+                    g.add_edge(idj, idi, D_KS = -D_KS, tau=tau, p=p)
+                else:
+                    g.add_edge(ids[i], ids[j], D_KS = D_KS, tau=tau, p=p)
+    return g
+
 
 
 
