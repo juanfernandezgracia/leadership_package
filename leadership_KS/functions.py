@@ -257,11 +257,11 @@ def D_KS_tau_pvalue_local(times, pmax = 1.0, Nruns=100, min_int=50, tfloat=True)
     times : dictionary of lists
         The dictionary contains for each element their times of events in a list
     pmax : float (optional)
-        maximum p-value allowed for each edge
+        Maximum p-value allowed for each edge
     Nruns : integer (optional)
         Number of reshufflings used for getting the p-value
     min_int : integer
-        minimum number of interactions (waiting times)
+        Minimum number of interactions (waiting times)
     tfloat : boolean variable 
         If True the times are taken as floats, if False event times are datetime type
     Returns
@@ -285,7 +285,7 @@ def D_KS_tau_pvalue_local(times, pmax = 1.0, Nruns=100, min_int=50, tfloat=True)
             for irun in range(Nruns):
                 print(Nruns-irun)
                 t_rand = randomize_times( times, [idi, idj])
-                tab,tba = waiting_times(t_rand, tfloat = tfloat)
+                tab,tba = waiting_times(t_rand, [idi, idj], tfloat = tfloat)
                 D_KS_rand, p_bad, tau_rand = ks_2samp(tab, tba)
                 if abs(D_KS_rand) < abs(D_KS):
                     p-=1
@@ -297,80 +297,94 @@ def D_KS_tau_pvalue_local(times, pmax = 1.0, Nruns=100, min_int=50, tfloat=True)
                     g.add_edge(ids[i], ids[j], D_KS = D_KS, tau=tau, p=p)
     return g
 
-
-
-
-
-def excess(t1,t2,dt=5,tmax=500,tfloat=True):
+def excess(times, ids, dt = 5 , tmax = 500, tfloat=True):
     """
-    function to compute the excess probability
+    Function to compute the excess rate of events of an element 
+    just after events of another one
+    Parameters
+    ----------
+    times : dictionary of lists
+        The dictionary contains for each element their times of events in a list
+    ids : list of ids
+        The two (in order), which will be compared
+    dt : float (optional)
+        Size of temporal bins
+    tmax : float (optional)
+        Maximum time after which we compute
+    tfloat : boolean variable 
+        If True the times are taken as floats, if False event times are datetime type
+    Returns
+    -------
+    x : list of floats
+        Time values for each bin
+    y_f : list of floats
+        Excess rate for each bin
     """
-    x=np.asarray([dt*(i+0.5) for i in range(int(tmax/dt))])
-    y=np.zeros(int(tmax/dt))
-    y_norm=np.zeros(int(tmax/dt))
-    ids=[1 for i in range(len(t1))]+[2 for i in range(len(t2))]
-    t=t1+t2
-    temp=[i for i in sorted(zip(t,ids))]
-    t_s=[temp[i][0] for i in range(len(temp)) ]
-    ids_s=[temp[i][1] for i in range(len(temp)) ]
-    i=0
-    j=1
-    N=len(t_s)
-    i=0
+    x = np.asarray([dt*(i + 0.5) for i in range(int(tmax/dt))])
+    y = np.zeros(int(tmax/dt))
+    y_norm = np.zeros(int(tmax/dt))
+    ids = [1 for i in range(len(t1))]+[2 for i in range(len(t2))]
+    t = times[ids[0]] + times[ids[1]]
+    temp = [i for i in sorted(zip(t,ids))]
+    t_s = [temp[i][0] for i in range(len(temp)) ]
+    ids_s = [temp[i][1] for i in range(len(temp)) ]
+    j = 1
+    N = len(t_s)
+    i = 0
     while ids_s[i] != 1:
         i+=1
     while i < N-2:
-        prod=ids_s[i]*ids_s[i+1]
+        prod = ids_s[i]*ids_s[i+1]
         while i < N-2 and prod != 2:
-            dtemp=t_s[i+1]-t_s[i]
+            dtemp = t_s[i+1] - t_s[i]
             if not tfloat:
-                minutes=dtemp.days*24.0*60.0+dtemp.seconds/60.0
-                i_dt=int((minutes)/dt)
+                minutes = dtemp.days*24.0*60.0 + dtemp.seconds/60.0
+                i_dt = int((minutes)/dt)
             else:
-                i_dt=int((dtemp)/dt)
+                i_dt = int((dtemp)/dt)
             if i_dt+1 < len(y):
                 for j in range(i_dt+1):
-                    y_norm[j]+=1.0
+                    y_norm[j] += 1.0
             else:
                 for j in range(len(y)):
-                    y_norm[j]+=1.0
+                    y_norm[j] += 1.0
             i+=1
-            prod=ids_s[i]*ids_s[i+1]
-        it1=i
-        dtemp=t_s[i+1]-t_s[it1]
+            prod = ids_s[i] * ids_s[i+1]
+        it1 = i
+        dtemp = t_s[i+1] - t_s[it1]
         if not tfloat:
-            minutes=dtemp.days*24.0*60.0+dtemp.seconds/60.0
-            i_dt=int((minutes)/dt)
+            minutes = dtemp.days*24.0*60.0+dtemp.seconds/60.0
+            i_dt = int((minutes)/dt)
         else:
-            i_dt=int((dtemp)/dt)
+            i_dt = int((dtemp)/dt)
         if i_dt < int(tmax/dt):
-            y[i_dt]+=1.0
+            y[i_dt] += 1.0
         i+=1
         while i < N-2 and ids_s[i+1] == 2:
-            dtemp=t_s[i+1]-t_s[it1]
+            dtemp = t_s[i+1] - t_s[it1]
             if not tfloat:
-                minutes=dtemp.days*24.0*60.0+dtemp.seconds/60.0
-                i_dt=int((minutes)/dt)
+                minutes = dtemp.days*24.0*60.0 + dtemp.seconds/60.0
+                i_dt = int((minutes)/dt)
             else:
-                i_dt=int((dtemp)/dt)
+                i_dt = int((dtemp)/dt)
             if i_dt < int(tmax/dt):
-                y[i_dt]+=1.0
-            i+=1
+                y[i_dt] += 1.0
+            i += 1
         i+=1
         if i < len(t_s):
-            dtemp=t_s[i]-t_s[it1]
+            dtemp = t_s[i]-t_s[it1]
             if not tfloat:
-                minutes=dtemp.days*24.0*60.0+dtemp.seconds/60.0
-                i_dt=int((minutes)/dt)
+                minutes = dtemp.days*24.0*60.0 + dtemp.seconds/60.0
+                i_dt = int((minutes)/dt)
             else:
-                i_dt=int((dtemp)/dt)
+                i_dt = int((dtemp)/dt)
         if i_dt+1 < len(y):
             for j in range(i_dt+1):
-                y_norm[j]+=1.0
+                y_norm[j] += 1.0
         else:
             for j in range(len(y)):
-                y_norm[j]+=1.0
-    y_f=[y[i]/(dt*y_norm[i]) for i in range(len(y))]
+                y_norm[j] += 1.0
+    y_f = [y[i] / (dt*y_norm[i]) for i in range(len(y))]
     return x,y_f
 
 # functions to plot basic quantities (missing)
