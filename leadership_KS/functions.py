@@ -116,7 +116,7 @@ def randomize_times(times, ids = []):
     for i in range(N):
         idn = ids[i]
         times_random[idn] = tlist[aux:Nevents[idn]]
-        aux += Nevents[idn]
+        aux = Nevents[idn]
         times_random[idn].sort()
     return times_random
 
@@ -176,7 +176,6 @@ def waiting_times(times, ids, tfloat=True):
     tba = list()
     idi = ids[0]
     idj = ids[1]
-    print (idi,len(times[idi]),idj,len(times[idj]))
     imin = min(times[idi])
     jmin = min(times[idj])
     if jmin > imin:
@@ -292,7 +291,6 @@ def D_KS_tau_pvalue_global(times,
                 D_KS_rand, p_bad, tau = ks_2samp(tab, tba)
             else:
                 D_KS_rand, p_bad, tau = (0.0, 0.0, 0.0)
-            print(abs(D_KS_rand), abs(D_KS))
             if abs(D_KS_rand) < abs(D_KS):
                 g[i][j]['p'] -= 1
     for edge in g.edges():

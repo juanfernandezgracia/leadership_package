@@ -37,25 +37,23 @@ fin.close()
 
 for idn in ids:
     times[idn].sort()
-    if idn == 28219:
-        print(idn,len(times[idn]))
-    if idn == 48557:
-        print(idn,len(times[idn]))
-    if idn == 48558:
-        print(idn,len(times[idn]))
-    if len(times[idn]) == 0:
-        times.pop(idn)
-
-sys.exit()
 
 g = leadership_KS.functions.D_KS_tau_pvalue_global(times,
-                                                   pmax = 0.5,
-                                                   Nruns = 1000,
+                                                   pmax = 0.01,
+                                                   Nruns = 500,
                                                    min_int = 50,
                                                    tfloat = False,
                                                    rand = 't')
 
-print(g.edges(data = True))
+print(len(g.edges()))
+g = leadership_KS.functions.D_KS_tau_pvalue_global(times,
+                                                   pmax = 0.01,
+                                                   Nruns = 500,
+                                                   min_int = 50,
+                                                   tfloat = False,
+                                                   rand = 'iet')
+
+print(len(g.edges()))
 
 sys.exit()
 

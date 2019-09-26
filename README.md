@@ -5,7 +5,7 @@ This package encapsulates the functions needed to apply the method described in 
 ## Installation
 
 ###Linux
-[//]: <> (`python setup.py sdist`)
+[comment]: <> (`python setup.py sdist`)
 
 Download the compressed package `leadership_KS-0.0.1.tar.gz` and run in a terminal (in the folder where you have downloaded the file):
 
