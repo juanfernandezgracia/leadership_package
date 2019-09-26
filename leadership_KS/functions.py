@@ -89,13 +89,13 @@ def randomize_times(times, ids = []):
     times : dictionary of lists
         The dictionary contains for each element their times of events in a list
     ids : list of ids
-        If not given, the reshuffling is global, if some ids are given, 
+        If not given, the reshuffling is global, if some ids are given,
         only those will be used for the reshuffling.
     Returns
     -------
     times_random : dictionary of lists
         For each element a list of reshuffled event times
-    
+
     """
     from random import shuffle
     times_random = dict()
@@ -118,20 +118,21 @@ def randomize_times(times, ids = []):
 
 def randomize_ietimes(times, ids = []):
     """
-    Randomize the times of the point events of all the ids that are given. 
-    This randomization keeps the starting time of each individual and reshuffles its own interevent times.
+    Randomize the times of the point events of all the ids that are given.
+    This randomization keeps the starting time of each individual and reshuffles
+    its own interevent times.
     Parameters
     ----------
     times : dictionary of lists
         The dictionary contains for each element their times of events in a list
     ids : list of ids
-        If not given, the reshuffling is global, if some ids are given, 
+        If not given, the reshuffling is global, if some ids are given,
         only those will be used for the reshuffling.
     Returns
     -------
     times_random : dictionary of lists
         For each element a list of reshuffled event times
-    
+
     """
     from random import shuffle
     times_random = dict()
@@ -156,14 +157,15 @@ def waiting_times(times, ids, tfloat=True):
     times : dictionary of lists
         The dictionary contains for each element their times of events in a list
     ids : 2 ids for the reshuffling in a list
-        If not given, the reshuffling is global, if some ids are given, 
+        If not given, the reshuffling is global, if some ids are given,
         only those will be used for the reshuffling.
     tfloat : boolean variable
-        If True the times are taken as floats, if False event times are datetime type
+        If True the times are taken as floats, if False event times are datetime
+        type
     Returns
     -------
     tab, tba : lists of time differences
-        
+
     """
     flag = 0
     tab = list()
@@ -219,7 +221,7 @@ def waiting_times(times, ids, tfloat=True):
     else:
         return tba, tab
 
-def D_KS_tau_pvalue_global(times, pmax = 1.0, Nruns=100, 
+def D_KS_tau_pvalue_global(times, pmax = 1.0, Nruns=100,
                            min_int = 50, tfloat = True, rand = 't'):
     """
     Gives back the network of follower-followees with a maximum p-value pmax,
@@ -234,8 +236,9 @@ def D_KS_tau_pvalue_global(times, pmax = 1.0, Nruns=100,
         Number of reshufflings used for getting the p-value
     min_int : integer
         minimum number of interactions (waiting times)
-    tfloat : boolean variable 
-        If True the times are taken as floats, if False event times are datetime type
+    tfloat : boolean variable
+        If True the times are taken as floats, if False event times are datetime
+        type
     rand : string
         't' reshuffles the event times among all the individuals
         'iet' reshuffles the interevents for each individual
@@ -287,7 +290,12 @@ def D_KS_tau_pvalue_global(times, pmax = 1.0, Nruns=100,
     G=networkx.DiGraph( [ (u,v,d) for u,v,d in g.edges(data=True) if d['p'] < pmax] )
     return G
 
-def D_KS_tau_pvalue_local(times, pmax = 1.0, Nruns=100, min_int=50, tfloat=True):
+def D_KS_tau_pvalue_local(times,
+                          pmax = 1.0,
+                          Nruns=100,
+                          min_int=50,
+                          tfloat=True
+                          ):
     """
     Gives back the network of follower-followees with a maximum p-value pmax,
     following a local reshuffling scheme.
@@ -301,7 +309,7 @@ def D_KS_tau_pvalue_local(times, pmax = 1.0, Nruns=100, min_int=50, tfloat=True)
         Number of reshufflings used for getting the p-value
     min_int : integer
         Minimum number of interactions (waiting times)
-    tfloat : boolean variable 
+    tfloat : boolean variable
         If True the times are taken as floats, if False event times are datetime type
     Returns
     -------
@@ -338,7 +346,7 @@ def D_KS_tau_pvalue_local(times, pmax = 1.0, Nruns=100, min_int=50, tfloat=True)
 
 def excess(times, ids, dt = 5 , tmax = 500, tfloat=True):
     """
-    Function to compute the excess rate of events of an element 
+    Function to compute the excess rate of events of an element
     just after events of another one
     Parameters
     ----------
@@ -350,8 +358,9 @@ def excess(times, ids, dt = 5 , tmax = 500, tfloat=True):
         Size of temporal bins
     tmax : float (optional)
         Maximum time after which we compute
-    tfloat : boolean variable 
-        If True the times are taken as floats, if False event times are datetime type
+    tfloat : boolean variable
+        If True the times are taken as floats, if False event times are datetime
+        type
     Returns
     -------
     x : list of floats
