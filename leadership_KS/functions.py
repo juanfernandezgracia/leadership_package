@@ -1,6 +1,4 @@
 import numpy as np
-import datetime
-
 def ks_2samp(data1, data2):
     """
     Computes the Kolmogorov-Smirnov statistic on 2 samples.
@@ -198,8 +196,8 @@ def waiting_times(times, ids, tfloat=True):
                 dtab = aux
                 tab.append(dtab)
             while times[a][ax] <= times[b][bx] and ax < Na-1:
-                ax+ = 1
-            if ax! = Na-1:
+                ax += 1
+            if ax != Na-1:
                 aux = times[b][bx] - times[a][ax-1]
                 dtba = aux
                 tba.append(dtba)
@@ -224,8 +222,13 @@ def waiting_times(times, ids, tfloat=True):
     else:
         return tba, tab
 
-def D_KS_tau_pvalue_global(times, pmax = 1.0, Nruns=100,
-                           min_int = 50, tfloat = True, rand = 't'):
+def D_KS_tau_pvalue_global(times,
+                           pmax = 1.0,
+                           Nruns = 100,
+                           min_int = 50,
+                           tfloat = True,
+                           rand = 't'
+                           ):
     """
     Gives back the network of follower-followees with a maximum p-value pmax,
     following a global reshuffling scheme.
@@ -252,6 +255,7 @@ def D_KS_tau_pvalue_global(times, pmax = 1.0, Nruns=100,
         The edges have properties such as D_KS, p and tau.
     """
     import networkx as nx
+    import datetime
     g=nx.DiGraph()
     tlist = []
     for key in times.keys():
@@ -271,9 +275,9 @@ def D_KS_tau_pvalue_global(times, pmax = 1.0, Nruns=100,
                 g.add_edge(ids[i], ids[j], D_KS = D_KS, tau=tau, p=Nruns)
     for irun in range(Nruns):
         print(Nruns-irun)
-        if rand = 't':
+        if rand == 't':
             t_rand = randomize_times(times)
-        elif rand = 'iet':
+        elif rand == 'iet':
             t_rand = randomize_ietimes(times)
         for edge in g.edges():
             i = edge[0]
@@ -290,7 +294,7 @@ def D_KS_tau_pvalue_global(times, pmax = 1.0, Nruns=100,
         i = edge[0]
         j = edge[1]
         g[i][j]['p'] = float(g[i][j]['p'])/float(Nruns)
-    G=networkx.DiGraph( [ (u,v,d) for u,v,d in g.edges(data=True) if d['p'] < pmax] )
+    G=nx.DiGraph( [ (u,v,d) for u,v,d in g.edges(data=True) if d['p'] <= pmax] )
     return G
 
 def D_KS_tau_pvalue_local(times,
@@ -298,7 +302,7 @@ def D_KS_tau_pvalue_local(times,
                           Nruns = 100,
                           min_int = 50,
                           tfloat = True
-    ):
+                          ):
     """
     Gives back the network of follower-followees with a maximum p-value pmax,
     following a local reshuffling scheme.
@@ -321,6 +325,8 @@ def D_KS_tau_pvalue_local(times,
         Graph containing the information about the follower-followee network.
         The edges have properties such as D_KS, p and tau.
     """
+    import datetime
+    import networkx as nx
     g = nx.DiGraph()
     ids = times.keys()
     for i in range(N-1):
