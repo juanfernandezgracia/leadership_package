@@ -120,7 +120,8 @@ def inverted_time_step(tau_targ, t, lam, delta, dt):
 
 def generate_hawkes(edges):
     """
-    UNDER CONSTRUCTION. Will need the package pyhawkes. Generates firing times of N individuals in a given network defined by edges.
+    UNDER CONSTRUCTION. Will need the package pyhawkes. Generates firing times
+    of N individuals in a given network defined by edges.
     """
     from pyhawkes.models import DiscreteTimeNetworkHawkesModelSpikeAndSlab
     np.random.seed(1122334455)

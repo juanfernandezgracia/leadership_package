@@ -101,17 +101,20 @@ def randomize_times(times, ids = []):
     from random import shuffle
     times_random = dict()
     if len(ids) == 0:
-        ids = times.keys()
+        ids = list(times.keys())
     Nevents = dict()
     aux = 0
     tlist = []
-    for idn in ids:
+    N = len(ids)
+    for i in range(N):
+        idn = ids[i]
         aux += len(times[idn])
         Nevents[idn] = aux
         tlist.extend(times[idn])
     shuffle(tlist)
     aux=0
-    for idn in ids:
+    for i in range(N):
+        idn = ids[i]
         times_random[idn] = tlist[aux:Nevents[idn]]
         aux += Nevents[idn]
         times_random[idn].sort()
@@ -173,6 +176,7 @@ def waiting_times(times, ids, tfloat=True):
     tba = list()
     idi = ids[0]
     idj = ids[1]
+    print (idi,len(times[idi]),idj,len(times[idj]))
     imin = min(times[idi])
     jmin = min(times[idj])
     if jmin > imin:
@@ -283,11 +287,12 @@ def D_KS_tau_pvalue_global(times,
             i = edge[0]
             j = edge[1]
             D_KS = g[i][j]['D_KS']
-            tab, tba = waiting_times(times, [i, j], tfloat = tfloat)
+            tab, tba = waiting_times(t_rand, [i, j], tfloat = tfloat)
             if len(tab) > min_int and len(tba) > min_int:
                 D_KS_rand, p_bad, tau = ks_2samp(tab, tba)
             else:
-                D_KS_rand, p_bad, tau=(0.0, 0.0, 0.0)
+                D_KS_rand, p_bad, tau = (0.0, 0.0, 0.0)
+            print(abs(D_KS_rand), abs(D_KS))
             if abs(D_KS_rand) < abs(D_KS):
                 g[i][j]['p'] -= 1
     for edge in g.edges():

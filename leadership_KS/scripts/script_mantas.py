@@ -3,6 +3,22 @@ import leadership_KS.generators
 import sys
 import datetime
 
+#read metadata
+
+# sex=dict()
+# size=dict()
+# fin=open('/home/juanf/Work/acoustic/mantas/manta_cleaning_station_metadata.csv','r')
+# for line in fin:
+#     line=line.split(',')
+#     if line[0]!='Tag ID':
+#         idn=int(line[0])
+#         sex[idn]=line[2][0]
+#         size[idn]=int(line[2][1])
+# fin.close()
+# ids = list(sex.keys())
+# N=len(ids)
+
+#read event data
 times = dict()
 ids = set()
 
@@ -21,13 +37,23 @@ fin.close()
 
 for idn in ids:
     times[idn].sort()
+    if idn == 28219:
+        print(idn,len(times[idn]))
+    if idn == 48557:
+        print(idn,len(times[idn]))
+    if idn == 48558:
+        print(idn,len(times[idn]))
+    if len(times[idn]) == 0:
+        times.pop(idn)
+
+sys.exit()
 
 g = leadership_KS.functions.D_KS_tau_pvalue_global(times,
-                                                   pmax = 0.002,
+                                                   pmax = 0.5,
                                                    Nruns = 1000,
                                                    min_int = 50,
-                                                   tfloat = True,
-                                                   rand = 'iet')
+                                                   tfloat = False,
+                                                   rand = 't')
 
 print(g.edges(data = True))
 
