@@ -69,11 +69,16 @@ def generate_correlated_times(delta = 2.0, dt = 0.5, tmax = 1000.0):
 
 def lam_det(times, dt):
     """
-    Auxiliary 
+    Auxiliary function to know the instantaneous firing rate
     Parameters
     ----------
+    times: dictionary of 2 lists of times
+        Dictionary with the lists of times of events for each process.
+    dt: float
+        time during which there is an extra firing rate    
     Returns
     -------
+    lam_det: list of tuples
     """
     N = len(times)
     lam = [(0, 0)]
@@ -111,7 +116,11 @@ def inverted_time_step(tau_targ, t, lam, delta, dt):
     t_good = lam_g[N_lam_g - 1][0] + (tau_targ - tau) / (1.0 + delta * lam_g[N_lam_g - 1][1])
     return t_good - t
 
+
 def generate_hawkes(edges):
+    """
+    UNDER CONSTRUCTION. Will need the package pyhawkes. Generates firing times of N individuals in a given network defined by edges.
+    """
     from pyhawkes.models import DiscreteTimeNetworkHawkesModelSpikeAndSlab
     np.random.seed(1122334455)
     # Create a simple random network with K nodes a sparsity level of p

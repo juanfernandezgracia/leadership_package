@@ -68,7 +68,7 @@ def ks_2samp(data1, data2):
     darray = cdf1 - cdf2
     d = np.max(np.absolute(darray))
     # Note: d signed distance
-    if d ==  -np.min(darray):
+    if d == -np.min(darray):
         d = -d
         jamfri = np.min(np.where(darray == np.min(darray))[0])
     else:
@@ -83,7 +83,7 @@ def ks_2samp(data1, data2):
 
 def randomize_times(times, ids = []):
     """
-    Randomize the times of the point events of all the ids that are given.
+    Randomize the times of the point events of all the ids that are given. This just reshuffles the event times among all the individuals taking into account.
     Parameters
     ----------
     times : dictionary of lists
@@ -114,6 +114,38 @@ def randomize_times(times, ids = []):
         times_random[idn] = tlist[aux:Nevents[idn]]
         aux += Nevents[idn]
         times_random[idn].sort()
+    return times_random
+
+def randomize_ietimes(times, ids = []):
+    """
+    Randomize the times of the point events of all the ids that are given. 
+    This randomization keeps the starting time of each individual and reshuffles its own interevent times.
+    Parameters
+    ----------
+    times : dictionary of lists
+        The dictionary contains for each element their times of events in a list
+    ids : list of ids
+        If not given, the reshuffling is global, if some ids are given, 
+        only those will be used for the reshuffling.
+    Returns
+    -------
+    times_random : dictionary of lists
+        For each element a list of reshuffled event times
+    
+    """
+    from random import shuffle
+    times_random = dict()
+    if len(ids) == 0:
+        ids = times.keys()
+    for idn in ids:
+        Nevents = len(times[idn])
+        ietlist = [times[idn][i+1]-times[idn][i] for i in range(Nevents-1)]
+        shuffle(ietlist)
+        t0 = times[idn][0]
+        times_random[idn] = [t0]
+        for i in range(Nevents-1):
+            t0 += ietlist[i]
+            times_random[idn] = [t0]
     return times_random
 
 def waiting_times(times, ids, tfloat=True):
@@ -187,7 +219,8 @@ def waiting_times(times, ids, tfloat=True):
     else:
         return tba, tab
 
-def D_KS_tau_pvalue_global(times, pmax = 1.0, Nruns=100, min_int=50, tfloat=True):
+def D_KS_tau_pvalue_global(times, pmax = 1.0, Nruns=100, 
+                           min_int = 50, tfloat = True, rand = 't'):
     """
     Gives back the network of follower-followees with a maximum p-value pmax,
     following a global reshuffling scheme.
@@ -203,6 +236,9 @@ def D_KS_tau_pvalue_global(times, pmax = 1.0, Nruns=100, min_int=50, tfloat=True
         minimum number of interactions (waiting times)
     tfloat : boolean variable 
         If True the times are taken as floats, if False event times are datetime type
+    rand : string
+        't' reshuffles the event times among all the individuals
+        'iet' reshuffles the interevents for each individual
     Returns
     -------
     g : Networkx DiGraph
@@ -229,7 +265,10 @@ def D_KS_tau_pvalue_global(times, pmax = 1.0, Nruns=100, min_int=50, tfloat=True
                 g.add_edge(ids[i], ids[j], D_KS = D_KS, tau=tau, p=Nruns)
     for irun in range(Nruns):
         print(Nruns-irun)
-        t_rand = randomize_times(times)
+        if rand = 't':
+            t_rand = randomize_times(times)
+        elif rand = 'iet':
+            t_rand = randomize_ietimes(times)
         for edge in g.edges():
             i = edge[0]
             j = edge[1]
@@ -387,4 +426,4 @@ def excess(times, ids, dt = 5 , tmax = 500, tfloat=True):
     y_f = [y[i] / (dt*y_norm[i]) for i in range(len(y))]
     return x,y_f
 
-# functions to plot basic quantities (missing)
+# TO DO: functions to plot basic quantities
