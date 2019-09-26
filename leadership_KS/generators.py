@@ -31,7 +31,7 @@ def generate_random_times(lam = 1.0, a = 2.0, tmax = 1000.0):
 def generate_correlated_times(delta = 2.0, dt = 0.5, tmax = 1000.0):
     """
     Generate one Poisson process of rate 1.0 and for the second one
-    the rate increases from 1.0 to 1.0+delta during dt after the 
+    the rate increases from 1.0 to 1.0+delta during dt after the
     first one did an event.
     Parameters
     ----------
@@ -46,6 +46,7 @@ def generate_correlated_times(delta = 2.0, dt = 0.5, tmax = 1000.0):
     times : dictionary of 2 lists of times
         Dictionary with the lists of times of events for each process.
     """
+    from random import expovariate
     times = {1:[], 2:[]}
     ids = times.keys()
     #do first time series as a Poisson process of rate 1
@@ -75,7 +76,7 @@ def lam_det(times, dt):
     times: dictionary of 2 lists of times
         Dictionary with the lists of times of events for each process.
     dt: float
-        time during which there is an extra firing rate    
+        time during which there is an extra firing rate
     Returns
     -------
     lam_det: list of tuples
@@ -84,7 +85,7 @@ def lam_det(times, dt):
     lam = [(0, 0)]
     lam.append((times[0], 1))
     for i in range(1, N):
-        delta_t = times[i] - times[i - 1] 
+        delta_t = times[i] - times[i - 1]
         if delta_t > dt:
             lam.append((times[i - 1] + dt, 0))
             lam.append((times[i], 1))
@@ -145,10 +146,10 @@ def generate_hawkes(edges):
 
     Tmax=50000
     S,R = true_model.generate(T = Tmax)
-    
-    
+
+
     times = dict()
-    
+
     for idi in range(K):
         for it in range(Tmax):
             n = S[it][idi]
@@ -162,5 +163,5 @@ def generate_hawkes(edges):
 
     for idn in ids:
         times[idn].sort()
-    
+
     return ids,times

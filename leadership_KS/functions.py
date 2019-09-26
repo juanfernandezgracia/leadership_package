@@ -147,7 +147,7 @@ def randomize_ietimes(times, ids = []):
         times_random[idn] = [t0]
         for i in range(Nevents-1):
             t0 += ietlist[i]
-            times_random[idn] = [t0]
+            times_random[idn].append(t0)
     return times_random
 
 def waiting_times(times, ids, tfloat=True):
