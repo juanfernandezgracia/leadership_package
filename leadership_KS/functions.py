@@ -18,7 +18,8 @@ def ks_2samp(data1, data2):
     prob, p-value : float
         two-tailed p-value
     tau : same type as data
-        value of data at which the two cumulative distributions have larger difference
+        value of data at which the two cumulative distributions have larger
+        difference
     Notes
     -----
     This tests whether 2 samples are drawn from the same distribution. Note
@@ -83,7 +84,9 @@ def ks_2samp(data1, data2):
 
 def randomize_times(times, ids = []):
     """
-    Randomize the times of the point events of all the ids that are given. This just reshuffles the event times among all the individuals taking into account.
+    Randomize the times of the point events of all the ids that are given. This
+    just reshuffles the event times among all the individuals taking into
+    account.
     Parameters
     ----------
     times : dictionary of lists
@@ -292,10 +295,10 @@ def D_KS_tau_pvalue_global(times, pmax = 1.0, Nruns=100,
 
 def D_KS_tau_pvalue_local(times,
                           pmax = 1.0,
-                          Nruns=100,
-                          min_int=50,
-                          tfloat=True
-                          ):
+                          Nruns = 100,
+                          min_int = 50,
+                          tfloat = True
+    ):
     """
     Gives back the network of follower-followees with a maximum p-value pmax,
     following a local reshuffling scheme.
@@ -310,7 +313,8 @@ def D_KS_tau_pvalue_local(times,
     min_int : integer
         Minimum number of interactions (waiting times)
     tfloat : boolean variable
-        If True the times are taken as floats, if False event times are datetime type
+        If True the times are taken as floats, if False event times are datetime
+        type
     Returns
     -------
     g : Networkx DiGraph
