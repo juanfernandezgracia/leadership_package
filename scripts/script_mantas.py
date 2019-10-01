@@ -37,20 +37,23 @@ fin.close()
 
 for idn in ids:
     times[idn].sort()
+#
+# g = leadership_KS.functions.D_KS_tau_pvalue_global(times,
+#                                                    pmax = 0.01,
+#                                                    Nruns = 500,
+#                                                    min_int = 50,
+#                                                    tfloat = False,
+#                                                    rand = 't')
+#
+# print(len(g.edges()))
+
+times = leadership_KS.generators.generate_correlated_times()
 
 g = leadership_KS.functions.D_KS_tau_pvalue_global(times,
-                                                   pmax = 0.01,
+                                                   pmax = 0.6,
                                                    Nruns = 500,
                                                    min_int = 50,
-                                                   tfloat = False,
-                                                   rand = 't')
-
-print(len(g.edges()))
-g = leadership_KS.functions.D_KS_tau_pvalue_global(times,
-                                                   pmax = 0.01,
-                                                   Nruns = 500,
-                                                   min_int = 50,
-                                                   tfloat = False,
+                                                   tfloat = True,
                                                    rand = 'iet')
 
 print(len(g.edges()))
