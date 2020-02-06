@@ -2,6 +2,8 @@ import leadership_KS.functions
 import leadership_KS.generators
 import sys
 import datetime
+import matplotlib.pyplot as plt
+import numpy as np
 
 #read metadata
 
@@ -37,7 +39,7 @@ fin.close()
 
 for idn in ids:
     times[idn].sort()
-#
+
 # g = leadership_KS.functions.D_KS_tau_pvalue_global(times,
 #                                                    pmax = 0.01,
 #                                                    Nruns = 500,
@@ -46,6 +48,65 @@ for idn in ids:
 #                                                    rand = 't')
 #
 # print(len(g.edges()))
+#
+# sys.exit()
+
+ids=[1,2]
+
+Nruns=5000
+Nbins=1000
+dp=Nbins/(2.0*Nruns)
+
+#example of correlated sequence and distribution of distances for reshufflings of the sequences
+
+fig = plt.figure()
+
+D_KS_distri=np.zeros(Nbins)
+for irun in range(Nruns):
+    print(Nruns-irun)
+    times=leadership_KS.generators.generate_correlated_times(delta=4.0,dt=0.2,tmax=1000)
+    #times=generate_random_times(a=1.0,tmax=1000)
+    tab,tba=leadership_KS.functions.waiting_times(times, ids)
+    D_KS,p,tau=leadership_KS.functions.ks_2samp(tab,tba)
+    ibin=int((D_KS+1.0)*Nbins/2.0)
+    D_KS_distri[ibin]+=dp
+x=[]
+y=[]
+for ibin in range(Nbins):
+    #if D_KS_distri[ibin] != 0.0:
+    x.append((0.5+2*ibin)/Nbins-1.0)
+    y.append(D_KS_distri[ibin])
+plt.plot(x,y,ls='--',lw=2,color='k',label='Real')
+
+ax = plt.axes()
+ax.arrow(D_KS, 0, 0, np.max(y)/2, lw=3, head_width=0.05, head_length=1, fc='r', ec='r',zorder=10)
+
+D_KS_distri=np.zeros(Nbins)
+for irun in range(Nruns):
+    print(Nruns-irun)
+    times_rand=leadership_KS.functions.randomize_ietimes(times)
+    #times=generate_random_times(a=1.0,tmax=100)
+    tab,tba=leadership_KS.functions.waiting_times(times_rand, ids)
+    D_KS,p,tau=leadership_KS.functions.ks_2samp(tab, tba)
+    ibin=int((D_KS+1.0)*Nbins/2.0)
+    D_KS_distri[ibin]+=dp
+x=[]
+y=[]
+for ibin in range(Nbins):
+    #if D_KS_distri[ibin] != 0.0:
+    x.append((0.5+2*ibin)/Nbins-1.0)
+    y.append(D_KS_distri[ibin])
+plt.plot(x,y,lw=2,color='g',label='Reshuffled')
+
+plt.xlabel('$A_{KS}$',fontsize=30)
+plt.ylabel('$P(A_{KS})$',fontsize=30)
+plt.legend(fontsize=20)
+fig.savefig('example_reshuffling_corr.png',bbox_inches='tight')
+plt.show()
+plt.close()
+
+sys.exit()
+
 
 times = leadership_KS.generators.generate_correlated_times()
 
