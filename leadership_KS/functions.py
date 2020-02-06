@@ -359,7 +359,7 @@ def D_KS_tau_pvalue_local(times,
 
 def excess(times, ids, dt = 5 , tmax = 500, tfloat=True):
     """
-    Function to compute the excess rate of events of an element
+    Function to compute the excess rate of events of an individual
     just after events of another one
     Parameters
     ----------
@@ -448,4 +448,66 @@ def excess(times, ids, dt = 5 , tmax = 500, tfloat=True):
     y_f = [y[i] / (dt*y_norm[i]) for i in range(len(y))]
     return x,y_f
 
+def clean_data(times, ):
+
 # TO DO: functions to plot basic quantities
+def plot_event_ranking(times, fname = str(), metadata = {}):
+    """
+    Plots the rank plot for the number of events.
+    Parameters
+    ----------
+    times : dictionary of lists
+        The dictionary contains for each element their times of events in a list
+    Returns
+    -------
+    Saves the figure as png and eps in the folder /figures.
+    """
+    import matplotlib.pyplot as plt
+    ids = list(times.keys())
+    event_num = [len(times[idi]) for idi in ids]
+    ids_sorted = [x for _,x in sorted(zip(event_num,ids),reverse=True)]
+    event_num.sort(reverse=True)
+
+    fig=plt.figure()
+    plt.yscale('log')
+
+    x_f=[]
+    event_num_f=[]
+    x_m=[]
+    event_num_m=[]
+
+    for i in range(len(event_num)):
+        if sex[ids_sorted[i]] == 'f':
+            x_f.append(i+1)
+            event_num_f.append(event_num[i])
+        else:
+            x_m.append(i+1)
+            event_num_m.append(event_num[i])
+
+
+    plt.plot(x_f,event_num_f,ls='',marker='o',color='r',ms=7,label='F')
+    plt.plot(x_m,event_num_m,ls='',marker='o',color='b',ms=7,label='M')
+
+    plt.xlabel('Rank',fontsize=30)
+    plt.ylabel('\# of events',fontsize=30)
+
+    plt.legend(fontsize=20)
+
+    fig.savefig('./figures/rank_plot_events_'+fname+'.png',bbox_inches='tight')
+    fig.savefig('./figures/rank_plot_events_'+fname+'.eps',bbox_inches='tight')
+    plt.show(block = False)
+    plt.close()
+    return
+
+def plot_raw_data(times, fname = str(), metadata = {}):
+    """
+    Plots a raster plot of the data.
+    Parameters
+    ----------
+    times : dictionary of lists
+        The dictionary contains for each element their times of events in a list
+    Returns
+    -------
+    Saves the figure as png and eps in the folder /figures.
+    """
+    return
