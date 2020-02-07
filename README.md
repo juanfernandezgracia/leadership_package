@@ -10,7 +10,7 @@ You can compile the code yourself by typing on a terminal:
 
 `python setup.py sdist`
 
-Or download the compressed package `leadership_KS-0.0.1.tar.gz` and run in a terminal (in the folder where you have downloaded the file):
+Or download the compressed package `dist/leadership_KS-0.0.1.tar.gz` and run in a terminal (in the folder where you have downloaded the file):
 
 `pip install leadership_KS-0.0.1.tar.gz`
 
@@ -28,12 +28,52 @@ This package is meant to be applied to point data for several entities and to ex
 
 ### Loading the data
 
+#### Basic data
+
+The data has to be loaded into a dictionary called `times` which has as keys the id's of the individuals and as values an ordered list with the times of appearance/activity of each individual. The times can be floats, integers or `datetime` instances (see [datetime module](https://docs.python.org/3/library/datetime.html)). In case they are floats or integers, when creating the network the argument `tfloat` has to be set to `True`. If they are datetime instances the `tfloat` argument has to be set to `False`.
+
+Examples of a valid `times` dictionaries are
+
+```python3
+times = {'1' : [1, 1.8, 2.3, 10], 
+         '2': [89], 
+         'Pepe': [2, 3.1415, 8.7]}
+```
+or **change this example to put one with datetime instances for the times**
+```
+times = {'1' : [1, 1.8, 2.3, 10], 
+         '2': [89], 
+         'Pepe': [2, 3.1415, 8.7]}
+```
+
+
+#### Adding metadata
+
+
 
 ### Ploting basic quantities
 
 
-### Getting the leadership network
+### The leadership network
 
+The leadership network will be stored as a `networkx.DiGraph`. 
+
+#### Getting the network
+
+The network will be calculated by the call
+
+```python3
+g = leadership_network(times,
+                       scheme = 'global',
+                       pmax = 1.0,
+                       Nruns = 100,
+                       min_int = 50,
+                       tfloat = True,
+                       rand = 't')
+```
+which will store the leadership network in the variable `g`. 
+
+#### Properties of the network
 
 ### Generating fake data
 

@@ -225,6 +225,61 @@ def waiting_times(times, ids, tfloat=True):
     else:
         return tba, tab
 
+def leadership_network(times,
+                           scheme = 'global',
+                           pmax = 1.0,
+                           Nruns = 100,
+                           min_int = 50,
+                           tfloat = True,
+                           rand = 't'
+                           ):
+    """
+    Gives back the network of follower-followees with a maximum p-value pmax,
+    following a particular reshuffling scheme.
+    Parameters
+    ----------
+    times : dictionary of lists
+        The dictionary contains for each element their times of events in a list
+    scheme : string
+        'global' for a global reshuffling scheme
+        'local' for a local reshuffling scheme
+    pmax : float (optional)
+        maximum p-value allowed for each edge
+    Nruns : integer (optional)
+        Number of reshufflings used for getting the p-value
+    min_int : integer
+        minimum number of interactions (waiting times)
+    tfloat : boolean variable
+        If True the times are taken as floats, if False event times are datetime
+        type
+    rand : string
+        't' reshuffles the event times among all the individuals
+        'iet' reshuffles the interevents for each individual
+    Returns
+    -------
+    g : Networkx DiGraph
+        Graph containing the information about the follower-followee network.
+        The edges have properties such as D_KS, p and tau.
+    """
+    if scheme = 'global':
+        return D_KS_tau_pvalue_global(times,
+                                   pmax = 1.0,
+                                   Nruns = 100,
+                                   min_int = 50,
+                                   tfloat = True,
+                                   rand = 't')
+    elif scheme = 'local':
+        return D_KS_tau_pvalue_local(times,
+                                  pmax = 1.0,
+                                  Nruns = 100,
+                                  min_int = 50,
+                                  tfloat = True
+                                  rand = 't')
+    else:
+        raise ValueError("Choose a proper reshuffling scheme:
+                         'local' or 'global'")
+
+
 def D_KS_tau_pvalue_global(times,
                            pmax = 1.0,
                            Nruns = 100,
@@ -305,6 +360,7 @@ def D_KS_tau_pvalue_local(times,
                           Nruns = 100,
                           min_int = 50,
                           tfloat = True
+                          rand = 't'
                           ):
     """
     Gives back the network of follower-followees with a maximum p-value pmax,
@@ -322,6 +378,9 @@ def D_KS_tau_pvalue_local(times,
     tfloat : boolean variable
         If True the times are taken as floats, if False event times are datetime
         type
+    rand : string
+        't' reshuffles the event times among all the individuals
+        'iet' reshuffles the interevents for each individual
     Returns
     -------
     g : Networkx DiGraph
@@ -344,7 +403,10 @@ def D_KS_tau_pvalue_local(times,
             p = Nruns
             for irun in range(Nruns):
                 print(Nruns-irun)
-                t_rand = randomize_times( times, [idi, idj])
+                if rand == 't':
+                    t_rand = randomize_times(times)
+                elif rand == 'iet':
+                    t_rand = randomize_ietimes(times)
                 tab,tba = waiting_times(t_rand, [idi, idj], tfloat = tfloat)
                 D_KS_rand, p_bad, tau_rand = ks_2samp(tab, tba)
                 if abs(D_KS_rand) < abs(D_KS):
