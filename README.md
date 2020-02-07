@@ -5,7 +5,7 @@ This package encapsulates the functions needed to apply the method described in 
 ## Installation
 
 ### Linux
-[//]: <> (`python setup.py sdist`)
+[comment]: <> (`python setup.py sdist`)
 
 Download the compressed package `leadership_KS-0.0.1.tar.gz` and run in a terminal (in the folder where you have downloaded the file):
 
@@ -43,6 +43,6 @@ This package is meant to be applied to point data for several entities and to ex
 
 #### A multivariate Hawkes process on an arbitrary network
 
-[//]: <> (This is a simple example package. You can use [Github-flavored Markdown](https://guides.github.com/features/mastering-markdown/) to write your content. )
+[comment]: <> (This is a simple example package. You can use [Github-flavored Markdown](https://guides.github.com/features/mastering-markdown/) to write your content. )
 
 
