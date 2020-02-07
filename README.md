@@ -4,18 +4,18 @@ This package encapsulates the functions needed to apply the method described in 
 
 ## Installation
 
-###Linux
+### Linux
 [//]: <> (`python setup.py sdist`)
 
 Download the compressed package `leadership_KS-0.0.1.tar.gz` and run in a terminal (in the folder where you have downloaded the file):
 
 `pip install leadership_KS-0.0.1.tar.gz`
 
-###Windows
+### Windows
 
 Install linux and go to the previous section.
 
-###Mac Os
+### Mac Os
 
 Same as with windows.
 
