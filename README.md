@@ -130,10 +130,9 @@ The network object has several variables embedded in it. These variables are div
  These variables can be accessed in the usual way when there are additional variables in a `networkx.DiGraph` object
  
   
- ```
-  node_sex = g\[node_id\]\['sex'\]
- 
-  edge_sex = g\[node_1\]\[node_2\]\['D_KS'\]
+ ```python3
+  node_sex = g[node_id]['sex']
+  edge_sex = g[node_1][node_2]['D_KS']
  ```
 
 ### Generating fake data
