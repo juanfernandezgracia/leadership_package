@@ -47,10 +47,9 @@ times = {'1' : [1, 1.8, 2.3, 10],
          'Pepe': [2, 3.1415, 8.7]}
 ```
 
-
 #### Adding metadata
 
-
+Right now the 
 
 ### Ploting basic quantities
 
@@ -112,7 +111,30 @@ Let's go through the arguments!
 
 #### Properties of the network
 
-The network object has several variables embedded in it.
+The network object has several variables embedded in it. These variables are divided into two classes
+
+* Node variables:
+
+    * `sex`:
+    
+    * `size`:
+ 
+ * Edge variables:
+ 
+     * `D_KS`:
+     
+     * `p`:
+     
+     * `tau`:
+ 
+ These variables can be accessed in the usual way when there are additional variables in a `networkx.DiGraph` object
+ 
+  
+ ```
+  node_sex = g\[node_id\]\['sex'\]
+ 
+  edge_sex = g\[node_1\]\[node_2\]\['D_KS'\]
+ ```
 
 ### Generating fake data
 
@@ -125,6 +147,5 @@ It is useful to generate data where we already know the result in terms of the l
 
 
 #### A multivariate Hawkes process on an arbitrary network
-
 
 
