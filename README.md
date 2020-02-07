@@ -11,11 +11,11 @@ Download the compressed package `leadership_KS-0.0.1.tar.gz` and run in a termin
 
 `pip install leadership_KS-0.0.1.tar.gz`
 
-### Windows
+#### Windows
 
 Install linux and go to the previous section.
 
-### Mac Os
+#### Mac Os
 
 Same as with windows.
 
@@ -23,12 +23,25 @@ Same as with windows.
 
 This package is meant to be applied to point data for several entities and to extract leader-follower relations for those entities.
 
-### Loading the data and ploting basic quantities
+### Loading the data
 
+
+### Ploting basic quantities
 
 
 ### Getting the leadership network
 
+
+### Generating fake data
+
+
+#### Two uncorrelated Poisson processes
+
+
+#### One Poisson process and a non-homogeneous Poisson process correlated with the first one
+
+
+#### A multivariate Hawkes process on an arbitrary network
 
 [//]: <> (This is a simple example package. You can use [Github-flavored Markdown](https://guides.github.com/features/mastering-markdown/) to write your content. )
 
