@@ -14,13 +14,9 @@ Or download the compressed package `dist/leadership_KS-0.0.1.tar.gz` and run in 
 
 `pip install leadership_KS-0.0.1.tar.gz`
 
-#### Windows
+### Other OSs
 
-Install linux and go to the previous section.
-
-#### Mac Os
-
-Same as with windows.
+:man_shrugging:
 
 ## Using the package
 
@@ -113,24 +109,23 @@ Let's go through the arguments!
 
 The network object has several variables embedded in it. These variables are divided into two classes
 
-* Node variables:
+* Node variables (if we have entered the metadata for it):
 
-    * `sex`:
+    * `sex`: sex of the individual.
     
-    * `size`:
+    * `size`: size of the individual.
  
  * Edge variables:
  
-     * `D_KS`:
+     * `D_KS`: Value of the Kolmogorov-Smirnof distance.
      
-     * `p`:
+     * `p`: p-value associated to the D_KS of the edge.
      
-     * `tau`:
+     * `tau`: Value of time at which we find the maximum distance between cumulative waiting time distributions.
  
  These variables can be accessed in the usual way when there are additional variables in a `networkx.DiGraph` object
  
-  
- ```python3
+  ```python3
   node_sex = g[node_id]['sex']
   edge_sex = g[node_1][node_2]['D_KS']
  ```
@@ -140,6 +135,7 @@ The network object has several variables embedded in it. These variables are div
 It is useful to generate data where we already know the result in terms of the leadershiop network. For this purpose the package implements through the *generators* some models where who is leading who is obvious by construction.
 
 #### Two uncorrelated Poisson processes
+
 
 
 #### One Poisson process and a non-homogeneous Poisson process correlated with the first one
