@@ -108,14 +108,15 @@ Let's go through the arguments!
     
     * `'iet'` reshuffles the interevents for each individual.
 
-<span style="color:red">**Although it is coded, it makes no sense to make a local reshuffling of interevent times. Have it in mind!**</span>
+**Although it is coded, it makes no sense to make a local reshuffling of interevent times. Have it in mind!**
 
 #### Properties of the network
 
-
+The network object has several variables embedded in it.
 
 ### Generating fake data
 
+It is useful to generate data where we already know the result in terms of the leadershiop network. For this purpose the package implements through the *generators* some models where who is leading who is obvious by construction.
 
 #### Two uncorrelated Poisson processes
 

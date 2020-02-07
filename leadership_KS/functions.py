@@ -510,7 +510,7 @@ def excess(times, ids, dt = 5 , tmax = 500, tfloat=True):
     y_f = [y[i] / (dt*y_norm[i]) for i in range(len(y))]
     return x,y_f
 
-def clean_data(times, ):
+# def clean_data(times, ):
 
 # TO DO: functions to plot basic quantities
 def plot_event_ranking(times, fname = str(), metadata = {}):
