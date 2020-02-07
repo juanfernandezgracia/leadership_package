@@ -40,6 +40,7 @@ times = {'1' : [1, 1.8, 2.3, 10],
          'Pepe': [2, 3.1415, 8.7]}
 ```
 or **change this example to put one with datetime instances for the times**
+
 ```
 times = {'1' : [1, 1.8, 2.3, 10], 
          '2': [89], 
@@ -60,9 +61,19 @@ The leadership network will be stored as a `networkx.DiGraph`.
 
 #### Getting the network
 
-The network will be calculated by the call
+The network will be calculated using the call
 
 ```python3
+import leadership_KS.functions
+import datetime
+import numpy as np
+
+# load the data in the dictionary 'times'
+times = {'1' : [1, 1.8, 2.3, 10], 
+         '2': [89], 
+         'Pepe': [2, 3.1415, 8.7]}
+         
+# calculate the leadership network and put it in 'g'
 g = leadership_network(times,
                        scheme = 'global',
                        pmax = 1.0,
@@ -73,7 +84,35 @@ g = leadership_network(times,
 ```
 which will store the leadership network in the variable `g`. 
 
+Let's go through the arguments!
+
+* `times` : dictionary of lists. The dictionary contains for each element their times of events in a list (see [Basic data](#basic-data)). 
+
+* `scheme` : string. Tells which reshuffling scheme to use.
+
+    *  `'global'` for a global reshuffling scheme. All individuals are taken together for doing the reshuffling of times.
+    
+    * `'local'` for a local reshuffling scheme. The individuals are taken by pairs to do the reshuffling.
+    
+* `pmax` : float (optional). Initializes to 1.0. It is the maximum p-value allowed for each edge.
+
+* `Nruns` : integer (optional). Number of reshufflings used for getting the p-value.
+
+* `min_int` : integer (optional). Minimum number of interactions (waiting times).
+
+* `tfloat` : boolean variable. If True the times are taken as floats, if False event times are datetime type.
+
+* `rand` : string. Type of time reshuffling to be done.
+
+    * `'t'` reshuffles the event times among all the individuals.
+    
+    * `'iet'` reshuffles the interevents for each individual.
+
+<span style="color:red">**Although it is coded, it makes no sense to make a local reshuffling of interevent times. Have it in mind!**</span>
+
 #### Properties of the network
+
+
 
 ### Generating fake data
 
