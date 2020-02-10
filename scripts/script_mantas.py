@@ -194,7 +194,6 @@ for idn in ids:
 event_num = [len(times[idi]) for idi in ids]
 
 ids_sorted = [x for _,x in sorted(zip(event_num,ids),reverse=True)]
-
 event_num.sort(reverse=True)
 
 fig=plt.figure()

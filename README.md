@@ -45,10 +45,13 @@ times = {'1' : [1, 1.8, 2.3, 10],
 
 #### Adding metadata
 
-Right now the 
+Right now the only supported metadata are `sex` and `size`. They are stored initially in a dictionary whose keys are the ids and values are `'f'` or `'m'` for sex (femenine and masculine) and a number between 1 and 4 for size.
 
 ### Ploting basic quantities
 
+To start one would like to have a look at how the data looks like. For that there are a couple of ploting functions included in the package.
+
+**WORK IN PROGRESS**
 
 ### The leadership network
 

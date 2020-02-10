@@ -92,6 +92,24 @@ def lam_det(times, dt):
     return lam
 
 def inverted_time_step(tau_targ, t, lam, delta, dt):
+    '''
+    Auxiliary function for the generation of a non-homogeneous Poisson process.
+    Parameters
+    ----------
+    tau_targ : float
+        time to invert.
+    t : float
+        time of previous event.
+    lam : float (optional)
+        Rate of Poisson process 1.
+    delta : float (optional)
+        Excess rate for the second process.
+    dt : float
+        Time during which the excess rate has impact.
+    Returns
+    -------
+    t_good - t: time until next event.
+    '''
     ind = 0
     N = len(lam)
     while lam[ind][0] < t and ind < N-1:
