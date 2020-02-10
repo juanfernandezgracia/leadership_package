@@ -72,7 +72,7 @@ times = {'1' : [1, 1.8, 2.3, 10],
          'Pepe': [2, 3.1415, 8.7]}
          
 # calculate the leadership network and put it in 'g'
-g = leadership_network(times,
+g = leadership_KS.functions.leadership_network(times,
                        scheme = 'global',
                        pmax = 1.0,
                        Nruns = 100,
@@ -139,6 +139,28 @@ It is useful to generate data where we already know the result in terms of the l
 
 #### Two uncorrelated Poisson processes
 
+One of the properties of the measure is that when two series of events are uncorrelated among each other, it does not predict a leadership-follower relation. To test this we can generate two independent Poisson processes and feed them to the method.
+
+How to generate two Poisson processes? Here is how
+
+```python3
+import leadership_KS.functions
+import leadership_KS.generators
+import numpy as np
+
+# generate two independent Poisson processes and load the data in the dictionary 'times'
+times = leadership_KS.generators.generate_random_times(lam = 1.0, a = 2.0, tmax = 1000.0)
+         
+# calculate the leadership network and put it in 'g'
+g = leadership_KS.functions.leadership_network(times,
+                       scheme = 'global',
+                       pmax = 1.0,
+                       Nruns = 100,
+                       min_int = 50,
+                       tfloat = True,
+                       rand = 't')
+```
+**put a figure of it working.**
 
 
 #### One Poisson process and a non-homogeneous Poisson process correlated with the first one
