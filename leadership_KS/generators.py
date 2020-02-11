@@ -99,7 +99,7 @@ def inverted_time_step(tau_targ, t, lam, delta, dt):
     tau_targ : float
         time to invert.
     t : float
-        time of previous event.
+        time of previous event
     lam : float (optional)
         Rate of Poisson process 1.
     delta : float (optional)
