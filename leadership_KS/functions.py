@@ -153,7 +153,10 @@ def randomize_ietimes(times, ids = []):
             times_random[idn].append(t0)
     return times_random
 
-def waiting_times(times, ids, tfloat=True):
+def waiting_times(times, 
+                  ids, 
+                  tfloat=True, 
+                  t_max=0.0):
     """
     Get the waiting times for two individuals
     Parameters
@@ -166,6 +169,8 @@ def waiting_times(times, ids, tfloat=True):
     tfloat : boolean variable
         If True the times are taken as floats, if False event times are datetime
         type
+    t_max : float
+        If different from 0 then only times 
     Returns
     -------
     tab, tba : lists of time differences
@@ -261,23 +266,22 @@ def leadership_network(times,
         Graph containing the information about the follower-followee network.
         The edges have properties such as D_KS, p and tau.
     """
-    if scheme = 'global':
+    if scheme == 'global':
         return D_KS_tau_pvalue_global(times,
-                                   pmax = 1.0,
-                                   Nruns = 100,
-                                   min_int = 50,
-                                   tfloat = True,
-                                   rand = 't')
-    elif scheme = 'local':
+                                   pmax = pmax,
+                                   Nruns = Nruns,
+                                   min_int = min_int,
+                                   tfloat = tfloat,
+                                   rand = rand)
+    elif scheme == 'local':
         return D_KS_tau_pvalue_local(times,
-                                  pmax = 1.0,
-                                  Nruns = 100,
-                                  min_int = 50,
-                                  tfloat = True
-                                  rand = 't')
+                                  pmax = pmax,
+                                  Nruns = Nruns,
+                                  min_int = min_int,
+                                  tfloat = tfloat,
+                                  rand = rand)
     else:
-        raise ValueError("Choose a proper reshuffling scheme:
-                         'local' or 'global'")
+        raise ValueError("Choose a proper reshuffling scheme:'local' or 'global'")
 
 
 def D_KS_tau_pvalue_global(times,
@@ -359,7 +363,7 @@ def D_KS_tau_pvalue_local(times,
                           pmax = 1.0,
                           Nruns = 100,
                           min_int = 50,
-                          tfloat = True
+                          tfloat = True,
                           rand = 't'
                           ):
     """

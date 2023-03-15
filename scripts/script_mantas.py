@@ -7,22 +7,22 @@ import numpy as np
 
 #read metadata
 
-# sex=dict()
-# size=dict()
-# fin=open('/home/juanf/Work/acoustic/mantas/manta_cleaning_station_metadata.csv','r')
-# for line in fin:
-#     line=line.split(',')
-#     if line[0]!='Tag ID':
-#         idn=int(line[0])
-#         sex[idn]=line[2][0]
-#         size[idn]=int(line[2][1])
-# fin.close()
-# ids = list(sex.keys())
-# N=len(ids)
+sex=dict()
+size=dict()
+fin=open('/home/juanf/Work/acoustic/mantas/manta_cleaning_station_metadata.csv','r')
+for line in fin:
+    line=line.split(',')
+    if line[0]!='Tag ID':
+        idn=int(line[0])
+        sex[idn]=line[2][0]
+        size[idn]=int(line[2][1])
+fin.close()
+ids = list(sex.keys())
+N=len(ids)
 
 #read event data
 times = dict()
-ids = set()
+ids = []
 
 fin=open('/home/juanf/Work/acoustic/mantas/manta_cleaning_station_data.csv','r')
 for line in fin:
@@ -33,19 +33,142 @@ for line in fin:
         if idn in ids:
             times[idn].append(t)
         else:
-            ids.add(idn)
+            ids.append(idn)
             times[idn] = [t]
 fin.close()
 
 for idn in ids:
     times[idn].sort()
 
-# g = leadership_KS.functions.D_KS_tau_pvalue_global(times,
-#                                                    pmax = 0.01,
-#                                                    Nruns = 500,
-#                                                    min_int = 50,
-#                                                    tfloat = False,
-#                                                    rand = 't')
+# get distribution of waiting times for all the pairs
+
+fig=plt.figure()
+
+base = 1.1
+r = 1.0/np.log(base)
+nbins = 131
+
+wt_glob_distri = np.zeros(nbins)
+norm_glob = 0
+
+for idi in range(len(ids)-1):
+    for idj in range(idi+1, len(ids)):
+        ids_ = [ids[idi], ids[idj]]
+        tba, tab = leadership_KS.functions.waiting_times(times, ids_, tfloat=False)
+        if len(tba) > 50:
+            norm = 0
+            wt_distri = np.zeros(nbins)
+            for t in tba:
+                ibin = int(round(r*np.log(t)))
+                wt_distri[ibin] += 1
+                norm += 1
+                wt_glob_distri[ibin] += 1
+                norm_glob += 1
+            x = []
+            y = []
+            for ibin in range(nbins):
+                if wt_distri[ibin]!=0.0:
+                    exp=ibin
+                    x.append(np.power(base,exp))
+                    w_bin=(base-1.0)*np.power(base,exp-0.5)
+                    y.append(wt_distri[ibin]/(norm*w_bin))
+            plt.plot(x,y,ls='--',marker='o',lw=1,ms=4,color='grey',alpha=0.5)
+        if len(tab) > 50:
+            norm = 0
+            wt_distri = np.zeros(nbins)
+            for t in tab:
+                ibin = int(round(r*np.log(t)))
+                wt_distri[ibin] += 1
+                norm += 1
+                wt_glob_distri[ibin] += 1
+                norm_glob += 1
+            x = []
+            y = []
+            for ibin in range(nbins):
+                if wt_distri[ibin]!=0.0:
+                    exp=ibin
+                    x.append(np.power(base,exp))
+                    w_bin=(base-1.0)*np.power(base,exp-0.5)
+                    y.append(wt_distri[ibin]/(norm*w_bin))
+            plt.plot(x,y,ls='--',marker='o',lw=1,ms=4,color='grey',alpha=0.5)
+x = []
+y = []
+for ibin in range(nbins):
+    if wt_glob_distri[ibin]!=0.0:
+        exp=ibin
+        #print(ibin, np.power(base,exp))
+        x.append(np.power(base,exp))
+        w_bin=(base-1.0)*np.power(base,exp-0.5)
+        y.append(wt_glob_distri[ibin]/(norm_glob*w_bin))
+plt.plot(x,y,ls='--',marker='o',lw=1,ms=4,color='k',alpha=1.0)
+#print(x, y)
+plt.xscale('log')
+plt.yscale('log')
+plt.xlabel('time (minutes)', fontsize=20)
+plt.ylabel('pdf', fontsize=20)
+plt.xticks(fontsize=15)
+plt.yticks(fontsize=15)
+fig.savefig('../figures/wt_distributions.png', bbox_inches='tight')
+plt.show()
+sys.exit()
+
+
+#     interevent_times[idi]=[]
+#     for ix in range(len(times[idi])-1):
+#         dt=times[idi][ix+1]-times[idi][ix]
+#         minutes=dt.days*24.0*60.0+dt.seconds/60.0
+#         if minutes!=0.0:
+#             minlog=int(round(r*np.log(minutes)))
+#             #print(minlog,nhalf,minlog+nhalf)
+#             t_distri[minlog+nhalf]+=1.0
+#             t_distri_single[minlog+nhalf]+=1.0
+#             #print(minlog+nhalf,t_distri_single[minlog+nhalf])
+#             norm+=1
+#             norm_single+=1
+#             interevent_times[idi].append(minutes)
+#             interevents_all.append(minutes)
+#             if sex[idi]=='m':
+#                 interevents_m.append(minutes)
+#                 t_distri_m[minlog+nhalf]+=1.0
+#                 norm_m+=1
+#             else:
+#                 interevents_f.append(minutes)
+#                 t_distri_f[minlog+nhalf]+=1.0
+#                 norm_f+=1
+#     results = powerlaw.Fit(interevent_times[idi],xmin=10.0)
+#     #print(idi,sex[idi],results.power_law.alpha,results.power_law.sigma,results.power_law.xmin,max(interevent_times[idi]))
+#     fout2.write('%i & %i & %s & %f & %f & %f & %f & %i \\\\ \n' % (i+1,idi,sex[idi],results.power_law.alpha,results.power_law.sigma,results.power_law.xmin,max(interevent_times[idi]),len(interevent_times[idi])))
+#     x_single=list()
+#     y_single=list()
+#     for ibin in range(nbins):
+#         if t_distri_single[ibin]!=0.0:
+#             exp=ibin-nhalf
+#             x_single.append(np.power(base,exp))
+#             w_bin=(base-1.0)*np.power(base,exp-0.5)
+#             y_single.append(t_distri_single[ibin]/(norm_single*w_bin))
+#     plt.plot(x_single,y_single,ls='--',marker='o',lw=1,ms=4,color='grey',alpha=0.5)
+
+
+# results = powerlaw.Fit(interevents_f,xmin=10.0)
+# fout2.write('all & all & f & %f & %f & %f & %f & %f \\\\ \n' % (results.power_law.alpha,results.power_law.sigma,results.power_law.xmin,max(interevents_f),len(interevents_f)))
+# results = powerlaw.Fit(interevents_m,xmin=10.0)
+# fout2.write('all & all & m & %f & %f & %f & %f & %f \\\\ \n' % (results.power_law.alpha,results.power_law.sigma,results.power_law.xmin,max(interevents_m),len(interevents_m)))
+# results = powerlaw.Fit(interevents_all,xmin=10.0)
+# fout2.write('all & all & all & %f & %f & %f & %f & %f \n' % (results.power_law.alpha,results.power_law.sigma,results.power_law.xmin,max(interevents_all),len(interevents_all)))
+
+
+sys.exit()
+
+
+
+# g = leadership_KS.functions.leadership_network(times,
+                        #    scheme = 'global',
+                        #    pmax = 0.002,
+                        #    Nruns = 500,
+                        #    min_int = 50,
+                        #    tfloat = True,
+                        #    rand = 'iet'
+                        #    ):
 #
 # print(len(g.edges()))
 #

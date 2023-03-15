@@ -321,7 +321,7 @@ fig.savefig('./figures/cumulative_KS_example_Poisson.eps',bbox_inches='tight')
 plt.close()
 
 
-sys.exit()
+# sys.exit()
 
 
 
