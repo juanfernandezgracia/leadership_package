@@ -120,7 +120,43 @@ def randomize_times(times, ids = []):
         times_random[idn].sort()
     return times_random
 
-def randomize_ietimes(times, ids = []):
+# def randomize_ietimes(times, ids = []):
+#     """
+#     Randomize the times of the point events of all the ids that are given.
+#     This randomization keeps the starting time of each individual and reshuffles
+#     its own interevent times.
+#     Parameters
+#     ----------
+#     times : dictionary of lists
+#         The dictionary contains for each element their times of events in a list
+#     ids : list of ids
+#         If not given, the reshuffling is global, if some ids are given,
+#         only those will be used for the reshuffling.
+#     Returns
+#     -------
+#     times_random : dictionary of lists
+#         For each element a list of reshuffled event times
+
+#     """
+#     from random import shuffle
+#     times_random = dict()
+#     if len(ids) == 0:
+#         ids = times.keys()
+#     for idn in ids:
+#         Nevents = len(times[idn])
+#         ietlist = [times[idn][i+1]-times[idn][i] for i in range(Nevents-1)]
+#         shuffle(ietlist)
+#         t0 = times[idn][0]
+#         times_random[idn] = [t0]
+#         for i in range(Nevents-1):
+#             t0 += ietlist[i]
+#             times_random[idn].append(t0)
+#     return times_random
+from random import shuffle
+from datetime import timedelta
+import numbers
+
+def randomize_ietimes(times, ids=None):
     """
     Randomize the times of the point events of all the ids that are given.
     This randomization keeps the starting time of each individual and reshuffles
@@ -138,19 +174,29 @@ def randomize_ietimes(times, ids = []):
         For each element a list of reshuffled event times
 
     """
-    from random import shuffle
     times_random = dict()
-    if len(ids) == 0:
+    if ids is None:
         ids = times.keys()
     for idn in ids:
         Nevents = len(times[idn])
-        ietlist = [times[idn][i+1]-times[idn][i] for i in range(Nevents-1)]
-        shuffle(ietlist)
-        t0 = times[idn][0]
-        times_random[idn] = [t0]
-        for i in range(Nevents-1):
-            t0 += ietlist[i]
-            times_random[idn].append(t0)
+        if isinstance(times[idn][0], numbers.Number):  # if the variable is numeric
+            ietlist = [times[idn][i+1]-times[idn][i] for i in range(Nevents-1)]
+            shuffle(ietlist)
+            t0 = times[idn][0]
+            times_random[idn] = [t0]
+            for i in range(Nevents-1):
+                t0 += ietlist[i]
+                times_random[idn].append(t0)
+        elif isinstance(times[idn][0], timedelta):  # if the variable is timedelta
+            ietlist = [(times[idn][i+1] - times[idn][i]).total_seconds() for i in range(Nevents-1)]
+            shuffle(ietlist)
+            t0 = times[idn][0]
+            times_random[idn] = [t0]
+            for i in range(Nevents-1):
+                t0 += timedelta(seconds=ietlist[i])
+                times_random[idn].append(t0)
+        else:
+            raise TypeError("Unsupported variable type")
     return times_random
 
 def waiting_times(times, 
