@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/180329553.svg)](https://doi.org/10.5281/zenodo.14281447)
+
 # Leadership_KS
 
 This package encapsulates the functions needed to apply the method described in [Ref to paper]. The package is structured into two parts: one which encodes the function for getting the follower-followee networks from presence point data of multiple individuals at the same location, and one which contains generators for different types of models of point processes to test the measure.
