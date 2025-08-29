@@ -162,12 +162,6 @@ g = leadership_KS.functions.leadership_network(times,
                        tfloat = True,
                        rand = 't')
 ```
-**put a figure of it working.**
 
-
-#### One Poisson process and a non-homogeneous Poisson process correlated with the first one
-
-
-#### A multivariate Hawkes process on an arbitrary network
 
 
